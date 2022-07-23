@@ -9,24 +9,40 @@ const form = document.querySelector('#comment-form')
 const commentList = document.querySelector('#list')
 
 //count is current counter, likeCounter is # of likes for the count
+//this data is recorded and contained in counterObject
 let count = 0
 let likeCounter = 0
+let countObject = {
+    0:0
+}
+
+//setLike function allows us to extract the data in the object
+//to use in our Like function
+let setLike = () => {
+    if (count in countObject) {
+        likeCounter = countObject[count]
+    } else {
+        likeCounter = 0
+        countObject[count] = 0
+    }
+}
 
 //boolean to tell interval when to start and stop
 let isPaused = false
 
 //interval function to count
 let startup = setInterval(() => {
-    //if not pause, we count
+    //if not paused, we count
     if (!isPaused){
     count ++
-    likeCounter = 0
+    setLike()
     counterDisplay.textContent = count
 }}, 1000)
 
 //plus counter
 plus.addEventListener('click', () => {
     count ++
+    setLike()
     return counterDisplay.textContent = count
 })
 
@@ -34,17 +50,22 @@ plus.addEventListener('click', () => {
 //minus counter
 minus.addEventListener('click', () => {
     count --
+    setLike()
     return counterDisplay.textContent = count
 })
 
 //add heart comments
 heart.addEventListener('click', () => {
-    likeCounter++
+    likeCounter ++
 
-    //if likeCounter is over 1, we have already appended a child for the counter
-    //so we just need to grab the element and update the text...
-    if (likeCounter > 1){
-        const existingLI = document.getElementById(`LI${count}`)
+    //updates our record
+    countObject[count] = likeCounter
+
+    //existingLI will return undefined if count has not been recorded
+    const existingLI = document.getElementById(`LI${count}`)
+
+    //if existingLI is true we update the text...
+    if (existingLI){
         existingLI.textContent = `${count} has been liked ${likeCounter} times`
     } else { //... else we create a new li element and append
         let li = document.createElement('li')
